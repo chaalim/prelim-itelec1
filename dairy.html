@@ -71,7 +71,7 @@
     <main>
         <h1>Dairy Items I Have</h1>
         <ul id="dairyList">
-            <!-- Dynamically populated from localStorage or a database -->
+            
         </ul>
     </main>
 
@@ -80,9 +80,9 @@
     </footer>
 
     <script>
-        // Logic to fetch and display the fruit items from localStorage or a database
+       
         $(document).ready(function () {
-            // Example of fetching items (you would replace this with actual logic)
+           
             const fruits = JSON.parse(localStorage.getItem('dairy')) || [];
             fruits.forEach(item => {
                 $('#dairyList').append(`<li>${item.name} - $${item.price}</li>`);
