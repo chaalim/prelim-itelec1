@@ -13,6 +13,11 @@
 
         h1 {
             color: #f44336;
+            display: inline-block; /* To allow button positioning */
+        }
+
+        .button-container {
+            float: right; /* Position buttons to the right */
         }
 
         table {
@@ -52,11 +57,18 @@
             cursor: pointer;
             border-radius: 5px;
             font-size: 16px;
+            margin-left: 10px; /* Space between buttons */
         }
     </style>
 </head>
 <body>
     <h1>Items in My Cart</h1>
+
+    <div class="button-container">
+        <button id="sortByPrice">Sort by Price</button>
+        <button id="sortByName">Sort by Name</button>
+        <button id="sortByDate">Sort by Date</button>
+    </div>
 
     <table>
         <thead>
@@ -84,24 +96,46 @@
             const cartSummary = $('#cartSummary');
             const grandTotal = $('#grandTotal');
 
-            items.forEach(entry => {
-                if (entry.listId === '#haveList') {
-                    const item = entry.item;
-                    const totalItemPrice = item.price * item.quantity;
-                    totalPrice += totalItemPrice;
+            function renderCart(items) {
+                cartSummary.empty(); // Clear previous rows
+                totalPrice = 0; // Reset total price
 
-                    const row = $('<tr></tr>');
-                    row.append(`<td><img src="${item.image}" alt="${item.name}"></td>`);
-                    row.append(`<td>${item.name}</td>`);
-                    row.append(`<td>${item.brand}</td>`);
-                    row.append(`<td>₱${item.price.toFixed(2)}</td>`);
-                    row.append(`<td>${item.quantity}</td>`);
-                    row.append(`<td>₱${totalItemPrice.toFixed(2)}</td>`);
-                    cartSummary.append(row);
-                }
+                items.forEach(entry => {
+                    if (entry.listId === '#haveList') {
+                        const item = entry.item;
+                        const totalItemPrice = item.price * item.quantity;
+                        totalPrice += totalItemPrice;
+
+                        const row = $('<tr></tr>');
+                        row.append(`<td><img src="${item.image}" alt="${item.name}"></td>`);
+                        row.append(`<td>${item.name}</td>`);
+                        row.append(`<td>${item.brand}</td>`);
+                        row.append(`<td>₱${item.price.toFixed(2)}</td>`);
+                        row.append(`<td>${item.quantity}</td>`);
+                        row.append(`<td>₱${totalItemPrice.toFixed(2)}</td>`);
+                        cartSummary.append(row);
+                    }
+                });
+
+                grandTotal.text(totalPrice.toFixed(2));
+            }
+
+            $('#sortByPrice').on('click', function () {
+                const sortedItems = [...items].sort((a, b) => a.item.price - b.item.price);
+                renderCart(sortedItems);
             });
 
-            grandTotal.text(totalPrice.toFixed(2));
+            $('#sortByName').on('click', function () {
+                const sortedItems = [...items].sort((a, b) => a.item.name.localeCompare(b.item.name));
+                renderCart(sortedItems);
+            });
+
+            $('#sortByDate').on('click', function () {
+                const sortedItems = [...items].sort((a, b) => new Date(a.dateAdded) - new Date(b.dateAdded));
+                renderCart(sortedItems);
+            });
+
+            renderCart(items);
 
             $('#backToApp').on('click', function () {
                 window.location.href = 'home.html';
