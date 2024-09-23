@@ -69,9 +69,9 @@
     </header>
 
     <main>
-        <h1>Dairy Items I Have</h1>
+        <h1>Dairy Items</h1>
         <ul id="dairyList">
-            
+
         </ul>
     </main>
 
@@ -80,9 +80,9 @@
     </footer>
 
     <script>
-       
+
         $(document).ready(function () {
-           
+
             const fruits = JSON.parse(localStorage.getItem('dairy')) || [];
             fruits.forEach(item => {
                 $('#dairyList').append(`<li>${item.name} - $${item.price}</li>`);

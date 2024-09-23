@@ -101,6 +101,7 @@
             color: #fff;
         }
 
+        /* Existing CSS */
         #addNeed {
             background-color: #f44336;
         }
@@ -116,6 +117,28 @@
         #addHave:hover {
             background-color: #87ceeb;
         }
+
+        /* Updated Save List Button */
+        #saveListBtn {
+            background-color: yellow;
+            /* Set the button color */
+            color: #000;
+            /* Text color */
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #saveListBtn:hover {
+            background-color: #ffd700;
+            /* Darker shade on hover */
+        }
+
+        }
+
 
         h2 {
             color: #333;
@@ -167,6 +190,32 @@
             padding: 10px 0;
             position: relative;
         }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px;
+            text-align: center;
+        }
+
+        .modal button {
+            margin-top: 10px;
+        }
     </style>
 </head>
 
@@ -184,6 +233,7 @@
         <a href="meat.html">Meat</a>
         <a href="grains.html">Grains</a>
         <a href="summary.html">Cart Summary</a>
+        <a href="list.html">Saved Lists</a>
     </nav>
 
     <main>
@@ -220,6 +270,7 @@
 
             <input id="addNeed" type="button" value="Need">
             <input id="addHave" type="button" value="Have">
+            <input id="saveListBtn" type="button" value="Save List">
         </form>
 
         <h2>Items I need to Buy:</h2>
@@ -232,6 +283,17 @@
     <footer>
         <p>&copy; 2024 My Grocery List App</p>
     </footer>
+
+    <!-- Save List Modal -->
+    <div id="saveListModal" class="modal">
+        <div class="modal-content">
+            <h2>Save Your List</h2>
+            <label for="listName">Enter list name:</label>
+            <input type="text" id="listName" placeholder="List Name" required>
+            <button id="confirmSaveBtn">Save List</button>
+            <button onclick="document.getElementById('saveListModal').style.display='none'">Cancel</button>
+        </div>
+    </div>
 
     <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
     <script>
@@ -264,10 +326,9 @@
                     weight: parseFloat(weight),
                     category: category,
                     image: itemImage ? URL.createObjectURL(itemImage) : null
-
                 };
 
-                items.push({ item, listId });
+                items.push({item, listId});
                 saveToLocalStorage();
                 renderList('#needList');
 
@@ -349,6 +410,24 @@
 
             $('#addHave').on('click', function () {
                 addItem('#haveList');
+            });
+
+            $('#saveListBtn').on('click', function () {
+                $('#saveListModal').css('display', 'block');
+            });
+
+            $('#confirmSaveBtn').on('click', function () {
+                const listName = $('#listName').val().trim();
+                if (listName) {
+                    const savedLists = JSON.parse(localStorage.getItem('savedLists')) || {};
+                    savedLists[listName] = items;
+                    localStorage.setItem('savedLists', JSON.stringify(savedLists));
+                    alert('List saved successfully!');
+                    $('#listName').val('');
+                    $('#saveListModal').css('display', 'none');
+                } else {
+                    alert('Please enter a list name.');
+                }
             });
 
             $('#logoutBtn').on('click', function () {
