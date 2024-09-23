@@ -183,6 +183,7 @@
         <a href="dairy.html">Dairy</a>
         <a href="meat.html">Meat</a>
         <a href="grains.html">Grains</a>
+        <a href="summary.html">Cart Summary</a>
     </nav>
 
     <main>
@@ -235,7 +236,11 @@
     <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
     <script>
         $(document).ready(function () {
-            let items = []; // Store items globally
+            let items = JSON.parse(localStorage.getItem('groceryItems')) || [];
+
+            function saveToLocalStorage() {
+                localStorage.setItem('groceryItems', JSON.stringify(items));
+            }
 
             function addItem(listId) {
                 const itemName = $('#itemName').val();
@@ -259,9 +264,11 @@
                     weight: parseFloat(weight),
                     category: category,
                     image: itemImage ? URL.createObjectURL(itemImage) : null
+
                 };
 
-                items.push({item, listId});
+                items.push({ item, listId });
+                saveToLocalStorage();
                 renderList('#needList');
 
                 $('#itemName').val('');
@@ -274,14 +281,13 @@
             }
 
             function renderList(listId) {
-                $(listId).empty(); // Clear current list
+                $(listId).empty();
 
                 items.forEach((entry, index) => {
                     if (entry.listId === listId) {
                         const item = entry.item;
                         const listItem = $('<li></li>');
 
-                        // Checkbox only for the "I Need" list
                         if (listId === '#needList') {
                             const checkbox = $('<input type="checkbox">').on('change', function () {
                                 if (this.checked) {
@@ -309,13 +315,15 @@
                             $('#weight').val(item.weight);
                             $('#category').val(item.category);
                             $('#itemImage').val('');
-                            items.splice(index, 1); // Remove item from the list for editing
-                            renderList('#needList'); // Refresh the list
+                            items.splice(index, 1);
+                            renderList('#needList');
+                            saveToLocalStorage();
                         });
 
                         const deleteButton = $('<button>Delete</button>').on('click', function () {
-                            items.splice(index, 1); // Remove item from array
-                            renderList(listId); // Re-render list
+                            items.splice(index, 1);
+                            renderList(listId);
+                            saveToLocalStorage();
                         });
 
                         const img = $('<img>').attr('src', item.image);
@@ -327,11 +335,12 @@
             }
 
             function moveToHave(index) {
-                const entry = items.splice(index, 1)[0]; // Remove from "I Need" list
-                entry.listId = '#haveList'; // Change list ID
-                items.push(entry); // Add to the items array again
-                renderList('#needList'); // Re-render the "I Need" list
-                renderList('#haveList'); // Re-render the "I Have" list
+                const entry = items.splice(index, 1)[0];
+                entry.listId = '#haveList';
+                items.push(entry);
+                saveToLocalStorage();
+                renderList('#needList');
+                renderList('#haveList');
             }
 
             $('#addNeed').on('click', function () {
@@ -345,6 +354,9 @@
             $('#logoutBtn').on('click', function () {
                 window.location.href = 'index.html';
             });
+
+            renderList('#needList');
+            renderList('#haveList');
         });
     </script>
 
